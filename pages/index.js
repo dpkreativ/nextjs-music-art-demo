@@ -7,15 +7,15 @@ import UploadPopArt from '../components/UploadPopArt';
 export default function Home() {
   // === STATE MANAGEMENT ===
   // States for storing and uploading image and text for your album
-  const [myAlbumArtData, setmyAlbumArtData] = useState({ text: '', image: '' });
-  const [myAlbumArtPreview, setmyAlbumArtPreview] = useState();
+  const [myAlbumArtData, setMyAlbumArtData] = useState({ text: '', image: '' });
+  const [myAlbumArtPreview, setMyAlbumArtPreview] = useState();
 
   // States for storing, uploading, and applying Neural Art Style Transfer
   const [popArtPreview, setPopArtPreview] = useState();
   const [popArtData, setPopArtData] = useState();
 
   // Loading States
-  const [loadingMyAlbumArt, setloadingMyAlbumArt] = useState(false);
+  const [loadingMyAlbumArt, setLoadingMyAlbumArt] = useState(false);
   const [loadingPopArt, setLoadingPopArt] = useState(false);
 
   // === ONCHANGE FUNCTONS ===
@@ -23,7 +23,7 @@ export default function Home() {
       This function detects any changes to the text input 
   */
   const handleTextChange = (e) => {
-    setmyAlbumArtData({ ...myAlbumArtData, text: e.target.value });
+    setMyAlbumArtData({ ...myAlbumArtData, text: e.target.value });
   };
 
   /* Handle File Input Change: 
@@ -35,7 +35,7 @@ export default function Home() {
     reader.readAsDataURL(e.target.files[0]);
 
     reader.onload = (onLoadEvent) => {
-      setmyAlbumArtData({
+      setMyAlbumArtData({
         ...myAlbumArtData,
         image: onLoadEvent.target.result,
       });
@@ -65,6 +65,24 @@ export default function Home() {
   */
   const handleAlbumSubmit = async (e) => {
     e.preventDefault();
+    setLoadingMyAlbumArt(true);
+
+    try {
+      const { data } = await fetch('/api/uploadAlbumApi', {
+        method: 'POST',
+        body: JSON.stringify(myAlbumArtData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((res) => res.json());
+
+      setMyAlbumArtData({ ...myAlbumArtData, text: '', image: '' });
+      setMyAlbumArtPreview(data);
+      setLoadingMyAlbumArt(false);
+    } catch (error) {
+      console.log({ Error: error });
+      setLoadingMyAlbumArt(false);
+    }
   };
 
   /* Handle Album Art Style Transfer: 
