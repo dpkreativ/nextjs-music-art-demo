@@ -90,6 +90,19 @@ export default function Home() {
   */
   const handlePopArtSubmit = async (e) => {
     e.preventDefault();
+    setLoadingPopArt(true);
+
+    try {
+      const { data } = await fetch('./api/uploadPopArtApi', {
+        method: 'POST',
+        body: popArtPreview,
+      }).then((res) => res.json());
+      setPopArtData(data);
+      setLoadingPopArt(false);
+    } catch (error) {
+      console.log({ Error: error });
+      setLoadingPopArt(false);
+    }
   };
 
   return (
